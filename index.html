@@ -17,15 +17,29 @@ body {
   margin-top: 80px;
 }
 
+/* Title with shield and gradient */
 h1 {
   font-size: 44px;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
-h1 span.light {
-  color: #9CFFB2;
+
+h1 .shield {
+  font-size: 48px;
+  background: linear-gradient(90deg, #1b5e20, #7CFFB2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-h1 span.dark {
-  color: #1b5e20;
+
+h1 .text {
+  font-size: 44px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #1b5e20, #7CFFB2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 input {
@@ -45,6 +59,18 @@ button {
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+}
+
+#info {
+  margin: 25px auto;
+  max-width: 600px;
+  text-align: left;
+  font-size: 16px;
+  background: rgba(255,255,255,0.05);
+  padding: 15px 20px;
+  border-radius: 10px;
+  line-height: 1.5;
+  color: #b3e5fc;
 }
 
 #status {
@@ -79,12 +105,18 @@ button {
 
 <div class="container">
   <h1>
-    <span class="light">Rex</span><span class="dark">Save</span>
+    <span class="shield">🛡</span>
+    <span class="text">RexSave</span>
   </h1>
 
-  <p style="color:#b3e5fc;">
-    Enter a website link to estimate its safety, risk level, and possible threats.
-  </p>
+  <!-- Information section -->
+  <div id="info">
+    <strong>Information:</strong><br>
+    RexSave is a website safety checking tool that helps you quickly estimate the risk level of any URL. 
+    It gives a visual risk score, warns if a site may be harmful, scam, or unsafe, 
+    and helps users make informed decisions before visiting unknown websites. 
+    The system is designed to protect your data and guide you safely online.
+  </div>
 
   <input id="url" placeholder="https://example.com">
   <button onclick="startCheck()">SUBMIT</button>
