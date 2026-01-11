@@ -1,64 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>RexSave – Website Safety Check</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0a2540;
-      color: white;
-      text-align: center;
-      padding: 40px;
-    }
-    h1 {
-      color: #00ff99;
-    }
-    input {
-      width: 300px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #00ff99;
-      border: none;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-    #result {
-      margin-top: 30px;
-      font-size: 18px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>RexSave – Website Safety Check</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at center, #1e88e5 0%, #0a2540 70%);
+  color: white;
+  text-align: center;
+}
+
+.container {
+  margin-top: 80px;
+}
+
+h1 {
+  font-size: 44px;
+  font-weight: bold;
+}
+h1 span.light {
+  color: #9CFFB2;
+}
+h1 span.dark {
+  color: #1b5e20;
+}
+
+input {
+  width: 320px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  padding: 12px 22px;
+  font-size: 16px;
+  margin-left: 10px;
+  background: #00e5ff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#status {
+  margin-top: 25px;
+  font-size: 18px;
+}
+
+.circle {
+  margin: 30px auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 12px solid gray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+#warning {
+  margin-top: 15px;
+  font-size: 18px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
 </head>
+
 <body>
 
-  <h1>🛡 RexSave</h1>
-  <p>Enter a website link to check if it is safe, dangerous, scam, or harmful.</p>
+<div class="container">
+  <h1>
+    <span class="light">Rex</span><span class="dark">Save</span>
+  </h1>
+
+  <p style="color:#b3e5fc;">
+    Enter a website link to estimate its safety, risk level, and possible threats.
+  </p>
 
   <input id="url" placeholder="https://example.com">
-  <button onclick="check()">SUBMIT</button>
+  <button onclick="startCheck()">SUBMIT</button>
 
-  <div id="result"></div>
+  <div id="status"></div>
+  <div id="circle" class="circle" style="display:none;">0%</div>
+  <div id="warning"></div>
+</div>
 
-  <script>
-    function check() {
-      const url = document.getElementById("url").value;
-      if (!url) {
-        document.getElementById("result").innerText = "Please enter a website link.";
-        return;
-      }
-      document.getElementById("result").innerText =
-        "Proofing website... ⏳ (demo result shown)";
+<script>
+function startCheck() {
+  const url = document.getElementById("url").value;
+  if (!url) {
+    document.getElementById("status").innerText = "Please enter a website link.";
+    return;
+  }
 
-      setTimeout(() => {
-        document.getElementById("result").innerHTML =
-          "✅ Website appears SAFE<br>Risk level: 92%";
-      }, 3000);
+  let countdown = 5;
+  document.getElementById("circle").style.display = "none";
+  document.getElementById("warning").innerText = "";
+  document.getElementById("status").innerText =
+    "PROOFING WEBSITE... ⏳ " + countdown;
+
+  const timer = setInterval(() => {
+    countdown--;
+    document.getElementById("status").innerText =
+      "PROOFING WEBSITE... ⏳ " + countdown;
+
+    if (countdown <= 0) {
+      clearInterval(timer);
+      showResult();
     }
-  </script>
+  }, 1000);
+}
+
+function showResult() {
+  const score = Math.floor(Math.random() * 101); // demo risk score
+  const circle = document.getElementById("circle");
+  const warning = document.getElementById("warning");
+
+  circle.style.display = "flex";
+  circle.innerText = score + "%";
+
+  let color = "gray";
+  let text = "";
+
+  if (score === 100) {
+    color = "#0b3d0b"; // dark green
+    text = "Website is completely SAFE. You can enter it without concern.";
+  } else if (score >= 90) {
+    color = "#2e7d32"; // green
+    text = "Website appears SAFE. No major risks detected.";
+  } else if (score >= 70) {
+    color = "#1976d2"; // blue
+    text = "Website seems mostly safe, but proceed with caution.";
+  } else if (score >= 50) {
+    color = "#fbc02d"; // yellow
+    text = "Medium risk detected. Be careful with personal information.";
+  } else if (score >= 30) {
+    color = "#fb8c00"; // orange
+    text = "High risk. This website may be harmful or deceptive.";
+  } else {
+    color = "#c62828"; // red
+    text = "DANGEROUS WEBSITE. Do NOT enter or provide any information.";
+  }
+
+  circle.style.borderColor = color;
+  circle.style.color = color;
+  warning.innerText = text;
+  document.getElementById("status").innerText = "Analysis complete.";
+}
+</script>
 
 </body>
 </html>
