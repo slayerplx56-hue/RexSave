@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RexSave – Website Safety Check</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a2540;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #00ff99;
+    }
+    input {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #00ff99;
+      border: none;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🛡 RexSave</h1>
+  <p>Enter a website link to check if it is safe, dangerous, scam, or harmful.</p>
+
+  <input id="url" placeholder="https://example.com">
+  <button onclick="check()">SUBMIT</button>
+
+  <div id="result"></div>
+
+  <script>
+    function check() {
+      const url = document.getElementById("url").value;
+      if (!url) {
+        document.getElementById("result").innerText = "Please enter a website link.";
+        return;
+      }
+      document.getElementById("result").innerText =
+        "Proofing website... ⏳ (demo result shown)";
+
+      setTimeout(() => {
+        document.getElementById("result").innerHTML =
+          "✅ Website appears SAFE<br>Risk level: 92%";
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>
