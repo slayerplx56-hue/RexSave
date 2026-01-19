@@ -7,14 +7,13 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #2e8b57; /* keep your green background */
+  background: #2e8b57;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   color: white;
 }
-
 .container {
   background: rgba(0,0,0,0.25);
   padding: 25px;
@@ -23,14 +22,12 @@ body {
   text-align: center;
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
 }
-
 .title {
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 15px;
   color: #00ff99;
 }
-
 input {
   width: 100%;
   padding: 10px;
@@ -39,7 +36,6 @@ input {
   outline: none;
   margin-bottom: 12px;
 }
-
 button {
   width: 100%;
   padding: 10px;
@@ -49,47 +45,36 @@ button {
   font-weight: bold;
   cursor: pointer;
 }
-
 button:hover {
   background: #33ffad;
 }
-
 .result {
   margin-top: 15px;
   text-align: left;
 }
-
 .good { color: #00ff99; font-weight: bold; }
 .bad { color: #ff4d4d; font-weight: bold; }
-
 #circleBox {
-  display: none;
-  margin: 15px auto;
+  width: 120px;
+  height: 120px;
+  margin: 20px auto;
+  position: relative;
 }
-
-#circle {
-  width: 90px;
-  height: 90px;
+#riskCircle {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 6px solid #00ff99;
-  box-shadow: 0 0 20px #00ff99;
+  border: 12px solid green;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
-}
-
-#circleNum {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: bold;
-  color: #00ff99;
 }
-
 #warningText {
   margin-top: 10px;
   font-size: 13px;
 }
-
 .info {
   margin-top: 15px;
   font-size: 12px;
@@ -105,11 +90,17 @@ button:hover {
   <input id="urlInput" placeholder="Paste website link here">
   <button onclick="startAnalysis()">Analyze</button>
 
-  <div id="circleBox">
-    <div id="circle"><span id="circleNum">5</span></div>
+  <!-- Countdown -->
+  <div id="circleBox" style="display:none;">
+    <div id="circleCountdown" style="width:120px; height:120px; border-radius:50%; border:6px solid #00ff99; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:bold;">5</div>
   </div>
 
+  <!-- Results -->
   <div id="result" class="result"></div>
+
+  <!-- Risk Circle -->
+  <div id="riskCircle" style="display:none;"></div>
+
   <div id="warningText"></div>
 
   <div class="info">
@@ -125,20 +116,20 @@ function startAnalysis() {
   const url = document.getElementById("urlInput").value.trim();
   if (!url) return alert("Enter a website link");
 
+  // Hide previous
   document.getElementById("result").innerHTML = "";
+  document.getElementById("riskCircle").style.display = "none";
   document.getElementById("warningText").innerHTML = "";
 
   let time = 5;
   const box = document.getElementById("circleBox");
-  const num = document.getElementById("circleNum");
-
+  const countdown = document.getElementById("circleCountdown");
   box.style.display = "block";
-  num.innerText = time;
+  countdown.innerText = time;
 
   const timer = setInterval(() => {
     time--;
-    num.innerText = time;
-
+    countdown.innerText = time;
     if (time === 0) {
       clearInterval(timer);
       box.style.display = "none";
@@ -148,25 +139,43 @@ function startAnalysis() {
 }
 
 function analyze(url) {
+  // Simple simulation of percentages
+  let riskPercent = Math.floor(Math.random() * 100); // 0–99%
+  let isSafe = riskPercent > 50;
   let isScam = /free|bonus|verify|login|crypto|wallet/i.test(url);
   let isIllegal = /hack|crack|pirate|cheat/i.test(url);
   let isHarmful = isScam || isIllegal;
   let isReal = !isScam && !isIllegal;
-  let isSafe = isReal && !isHarmful;
 
+  // Show results
   document.getElementById("result").innerHTML = `
-    REAL: <span class="${isReal ? 'good' : 'bad'}">${isReal ? 'YES' : 'NO ❗'}</span><br>
-    SAFE: <span class="${isSafe ? 'good' : 'bad'}">${isSafe ? 'YES' : 'NO ❗'}</span><br>
-    HARMFUL: <span class="${isHarmful ? 'bad' : 'good'}">${isHarmful ? 'YES ❗' : 'NO'}</span><br>
-    SCAM: <span class="${isScam ? 'bad' : 'good'}">${isScam ? 'YES ❗' : 'NO'}</span><br>
-    ILLEGAL: <span class="${isIllegal ? 'bad' : 'good'}">${isIllegal ? 'YES ❗' : 'NO'}</span>
+    REAL: <span class="${isReal ? 'good':'bad'}">${isReal?'YES':'NO ❗'}</span><br>
+    SAFE: <span class="${isSafe?'good':'bad'}">${isSafe?'YES':'NO ❗'}</span><br>
+    HARMFUL: <span class="${isHarmful?'bad':'good'}">${isHarmful?'YES ❗':'NO'}</span><br>
+    SCAM: <span class="${isScam?'bad':'good'}">${isScam?'YES ❗':'NO'}</span><br>
+    ILLEGAL: <span class="${isIllegal?'bad':'good'}">${isIllegal?'YES ❗':'NO'}</span>
   `;
 
-  const warning = document.getElementById("warningText");
-  if (isSafe) warning.innerText = "✅ This website appears safe to enter.";
-  else if (!isSafe && !isHarmful) warning.innerText = "⚠️ Some caution is advised, website mostly safe.";
-  else if (isHarmful && !isIllegal) warning.innerText = "⚠️ High risk detected, avoid entering.";
-  else if (isIllegal) warning.innerText = "❌ Dangerous website detected! Do NOT enter!";
+  // Risk circle
+  const circle = document.getElementById("riskCircle");
+  circle.style.display = "flex";
+  circle.innerText = `${riskPercent}%`;
+
+  // Color based on percentage
+  if(riskPercent===100) circle.style.borderColor = "#006400"; // dark green
+  else if(riskPercent>=90) circle.style.borderColor = "#00ff00"; // green
+  else if(riskPercent>=70) circle.style.borderColor = "#00bfff"; // blue
+  else if(riskPercent>=50) circle.style.borderColor = "#ffff00"; // yellow
+  else if(riskPercent>=30) circle.style.borderColor = "#ff8000"; // orange
+  else circle.style.borderColor = "#ff0000"; // red
+
+  // Warning text
+  const warn = document.getElementById("warningText");
+  if(riskPercent>=90) warn.innerText = "✅ Safe to enter.";
+  else if(riskPercent>=70) warn.innerText = "⚠️ Mostly safe, proceed with caution.";
+  else if(riskPercent>=50) warn.innerText = "⚠️ Some risk detected, stay alert.";
+  else if(riskPercent>=30) warn.innerText = "❌ High risk! Avoid entering.";
+  else warn.innerText = "❌ Dangerous website! Do NOT enter!";
 }
 </script>
 
