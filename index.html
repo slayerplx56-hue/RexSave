@@ -1,266 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>RexSave – Website Safety Check</title>
+  <meta charset="UTF-8">
+  <title>RexSave Analyzer</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle at center, #1e88e5 0%, #0a2540 70%);
-  color: white;
-  text-align: center;
-}
+  <!-- KEEP OR REPLACE WITH YOUR OWN CSS -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f1f14;
+      color: #eaffea;
+      padding: 20px;
+    }
 
-.container {
-  margin-top: 70px;
-}
+    input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+    }
 
-h1 {
-  font-size: 44px;
-  font-weight: bold;
-}
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-.gradient {
-  background: linear-gradient(90deg, #1b5e20, #7CFFB2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+    .yes {
+      color: #2aff2a;
+      font-weight: bold;
+    }
 
-#info {
-  margin: 20px auto;
-  max-width: 620px;
-  background: rgba(255,255,255,0.05);
-  padding: 15px;
-  border-radius: 10px;
-  color: #b3e5fc;
-}
+    .no {
+      color: #ff3b3b;
+      font-weight: bold;
+    }
 
-input {
-  width: 320px;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 6px;
-  border: none;
-}
+    .warn {
+      color: #ff3b3b;
+      font-weight: bold;
+    }
 
-button {
-  padding: 12px 22px;
-  font-size: 16px;
-  margin-left: 10px;
-  background: #00e5ff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#status {
-  margin-top: 25px;
-  font-size: 18px;
-}
-
-.circle {
-  margin: 25px auto;
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  border: 12px solid gray;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-#table {
-  margin: 25px auto;
-  max-width: 420px;
-  display: none;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-td {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  font-size: 16px;
-  text-align: left;
-}
-
-.yes {
-  color: #7CFFB2;
-  font-weight: bold;
-}
-
-.no {
-  color: #ff5252;
-  font-weight: bold;
-}
-
-.alert {
-  color: #ff5252;
-  font-weight: bold;
-}
-
-#warning {
-  margin-top: 15px;
-  font-size: 18px;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>
+    .box {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #2aff2a;
+      border-radius: 6px;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-  <h1><span class="gradient">🛡 RexSave</span></h1>
+  <h1>RexSave Website Analyzer</h1>
 
-  <div id="info">
+  <p>
     <strong>Information:</strong><br>
-    RexSave estimates website safety using visible URL patterns and risk indicators.
-    It helps identify potentially harmful, scam, or illegal websites before you visit them.
-    Results are estimations and not a guarantee.
-  </div>
+    This website analyzes links to detect potential risks such as scams,
+    illegal content, phishing attempts, and unsafe behavior.  
+    The result is an automated risk estimation and does NOT replace human judgment.
+  </p>
 
-  <input id="url" placeholder="https://example.com">
-  <button onclick="startCheck()">SUBMIT</button>
+  <input id="urlInput" placeholder="Paste website link here">
+  <button onclick="analyze()">Analyze</button>
 
-  <div id="status"></div>
+  <div id="result" class="box"></div>
 
-  <div id="circle" class="circle">0%</div>
-
-  <div id="table">
-    <table>
-      <tr><td>REAL</td><td id="real"></td></tr>
-      <tr><td>SAFE</td><td id="safe"></td></tr>
-      <tr><td>HARMFUL</td><td id="harmful"></td></tr>
-      <tr><td>SCAM</td><td id="scam"></td></tr>
-      <tr><td>ILLEGAL</td><td id="illegal"></td></tr>
-    </table>
-  </div>
-
-  <div id="warning"></div>
-</div>
-
-<script>
-function startCheck() {
-  const url = document.getElementById("url").value.toLowerCase();
-  if (!url) {
-    document.getElementById("status").innerText = "Please enter a website link.";
-    return;
-  }
-
-  let countdown = 5;
-  document.getElementById("circle").style.display = "none";
-  document.getElementById("table").style.display = "none";
-  document.getElementById("warning").innerText = "";
-
-  document.getElementById("status").innerText =
-    "PROOFING WEBSITE... ⏳ " + countdown;
-
-  const timer = setInterval(() => {
-    countdown--;
-    document.getElementById("status").innerText =
-      "PROOFING WEBSITE... ⏳ " + countdown;
-
-    if (countdown <= 0) {
-      clearInterval(timer);
-      analyze(url);
-    }
-  }, 1000);
-}
-
-function analyze(url) {
-  let score = 90;
-  let real = true;
-  let harmful = false;
-  let scam = false;
-  let illegal = false;
-
-  // Known safe domains
-  const safeDomains = ["google.com", "wikipedia.org", "github.com", "microsoft.com"];
-  if (safeDomains.some(d => url.includes(d))) {
-    score = 95;
-  }
-
-  // Suspicious patterns
-  if (url.includes("free") || url.includes("money") || url.includes("login")) {
-    score -= 30;
-    scam = true;
-  }
-
-  if (url.includes(".xyz") || url.includes(".ru") || url.includes("hack")) {
-    score -= 40;
-    harmful = true;
-  }
-
-  if (url.includes("pirate") || url.includes("crack") || url.includes("illegal")) {
-    illegal = true;
-    score -= 50;
-  }
-
-  if (!url.startsWith("http")) {
-    real = false;
-    score -= 30;
-  }
-
-  if (score < 0) score = 0;
-
-  showResult(score, real, harmful, scam, illegal);
-}
-
-function showResult(score, real, harmful, scam, illegal) {
-  const circle = document.getElementById("circle");
-  const warning = document.getElementById("warning");
-
-  circle.style.display = "flex";
-  circle.innerText = score + "%";
-
-  let color = "#2e7d32";
-  let text = "Website appears SAFE.";
-
-  if (score < 30) {
-    color = "#c62828";
-    text = "DANGEROUS WEBSITE. Do NOT enter.";
-  } else if (score < 50) {
-    color = "#fb8c00";
-    text = "High risk detected. Avoid entering.";
-  } else if (score < 70) {
-    color = "#fbc02d";
-    text = "Medium risk. Proceed carefully.";
-  }
-
-  circle.style.borderColor = color;
-  circle.style.color = color;
-  warning.innerText = text;
-
-  document.getElementById("table").style.display = "block";
-
-  document.getElementById("real").innerHTML =
-    real ? "<span class='yes'>YES</span>" : "<span class='alert'>NO !</span>";
-
-  document.getElementById("safe").innerHTML =
-    score >= 70 ? "<span class='yes'>YES</span>" : "<span class='no'>NO</span>";
-
-  document.getElementById("harmful").innerHTML =
-    harmful ? "<span class='alert'>YES !</span>" : "<span class='yes'>NO</span>";
-
-  document.getElementById("scam").innerHTML =
-    scam ? "<span class='alert'>YES !</span>" : "<span class='yes'>NO</span>";
-
-  document.getElementById("illegal").innerHTML =
-    illegal ? "<span class='alert'>YES !</span>" : "<span class='yes'>NO</span>";
-
-  document.getElementById("status").innerText = "Analysis complete.";
-}
-</script>
-
+  <script src="analyzer.js"></script>
 </body>
 </html>
