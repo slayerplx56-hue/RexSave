@@ -1,69 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>RexSave Analyzer</title>
+<meta charset="UTF-8">
+<title>RexSave</title>
 
-  <!-- KEEP OR REPLACE WITH YOUR OWN CSS -->
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f1f14;
-      color: #eaffea;
-      padding: 20px;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0b3d2e, #3aff9e);
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    input {
-      width: 80%;
-      padding: 10px;
-      font-size: 16px;
-    }
+.container {
+  background: rgba(0,0,0,0.25);
+  padding: 25px;
+  border-radius: 16px;
+  width: 360px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+}
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  background: linear-gradient(to right, #0b3d2e, #6bffb3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-    .yes {
-      color: #2aff2a;
-      font-weight: bold;
-    }
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  margin-bottom: 12px;
+}
 
-    .no {
-      color: #ff3b3b;
-      font-weight: bold;
-    }
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #00ff99;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .warn {
-      color: #ff3b3b;
-      font-weight: bold;
-    }
+button:hover {
+  background: #33ffad;
+}
 
-    .box {
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px solid #2aff2a;
-      border-radius: 6px;
-    }
-  </style>
+.cooldown {
+  margin: 15px auto;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 6px solid #00ff99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  display: none;
+}
+
+.result {
+  margin-top: 15px;
+  text-align: left;
+}
+
+.good { color: #00ff99; font-weight: bold; }
+.bad { color: #ff4d4d; font-weight: bold; }
+
+.info {
+  margin-top: 15px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+</style>
 </head>
+
 <body>
 
-  <h1>RexSave Website Analyzer</h1>
-
-  <p>
-    <strong>Information:</strong><br>
-    This website analyzes links to detect potential risks such as scams,
-    illegal content, phishing attempts, and unsafe behavior.  
-    The result is an automated risk estimation and does NOT replace human judgment.
-  </p>
+<div class="container">
+  <div class="title">🛡 RexSave</div>
 
   <input id="urlInput" placeholder="Paste website link here">
-  <button onclick="analyze()">Analyze</button>
+  <button onclick="startAnalysis()">Analyze</button>
 
-  <div id="result" class="box"></div>
+  <div id="cooldown" class="cooldown">5</div>
+  <div id="status"></div>
 
-  <script src="analyzer.js"></script>
+  <div id="result" class="result"></div>
+
+  <div class="info">
+    <b>Information:</b><br>
+    RexSave analyzes websites for safety, legitimacy, scams, harmful
+    behavior and illegal content. Results are automated estimations and
+    should not replace professional judgment.
+  </div>
+</div>
+
+<script>
+function startAnalysis() {
+  const url = document.getElementById("urlInput").value.trim();
+  if (!url) return alert("Enter a website link");
+
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("status").innerText = "Proofing...";
+  
+  let time = 5;
+  const cd = document.getElementById("cooldown");
+  cd.style.display = "flex";
+  cd.innerText = time;
+
+  const timer = setInterval(() => {
+    time--;
+    cd.innerText = time;
+    if (time === 0) {
+      clearInterval(timer);
+      cd.style.display = "none";
+      document.getElementById("status").innerText = "";
+      analyze(url);
+    }
+  }, 1000);
+}
+
+function analyze(url) {
+  let isScam = /free|gift|bonus|login|verify|wallet|crypto/i.test(url);
+  let isIllegal = /hack|crack|pirate|cheat/i.test(url);
+  let isHarmful = isScam || isIllegal;
+  let isReal = !isScam && !isIllegal;
+  let isSafe = isReal && !isHarmful;
+
+  document.getElementById("result").innerHTML = `
+    REAL: <span class="${isReal ? 'good' : 'bad'}">${isReal ? 'YES' : 'NO ❗'}</span><br>
+    SAFE: <span class="${isSafe ? 'good' : 'bad'}">${isSafe ? 'YES' : 'NO ❗'}</span><br>
+    HARMFUL: <span class="${isHarmful ? 'bad' : 'good'}">${isHarmful ? 'YES ❗' : 'NO'}</span><br>
+    SCAM: <span class="${isScam ? 'bad' : 'good'}">${isScam ? 'YES ❗' : 'NO'}</span><br>
+    ILLEGAL: <span class="${isIllegal ? 'bad' : 'good'}">${isIllegal ? 'YES ❗' : 'NO'}</span>
+  `;
+}
+</script>
+
 </body>
 </html>
