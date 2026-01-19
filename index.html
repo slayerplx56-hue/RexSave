@@ -14,6 +14,7 @@ body {
   min-height: 100vh;
   color: white;
 }
+
 .container {
   background: rgba(0,0,0,0.25);
   padding: 25px;
@@ -22,12 +23,14 @@ body {
   text-align: center;
   box-shadow: 0 0 30px rgba(0,0,0,0.4);
 }
+
 .title {
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 15px;
   color: #00ff99;
 }
+
 input {
   width: 100%;
   padding: 10px;
@@ -36,6 +39,7 @@ input {
   outline: none;
   margin-bottom: 12px;
 }
+
 button {
   width: 100%;
   padding: 10px;
@@ -45,21 +49,39 @@ button {
   font-weight: bold;
   cursor: pointer;
 }
+
 button:hover {
   background: #33ffad;
 }
+
 .result {
   margin-top: 15px;
   text-align: left;
 }
+
 .good { color: #00ff99; font-weight: bold; }
 .bad { color: #ff4d4d; font-weight: bold; }
+
 #circleBox {
   width: 120px;
   height: 120px;
   margin: 20px auto;
   position: relative;
 }
+
+#circleCountdown {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 6px solid #00ff99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  margin: 0 auto;
+}
+
 #riskCircle {
   width: 120px;
   height: 120px;
@@ -68,13 +90,16 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
+  margin: 20px auto; /* center horizontally */
 }
+
 #warningText {
   margin-top: 10px;
   font-size: 13px;
 }
+
 .info {
   margin-top: 15px;
   font-size: 12px;
@@ -92,7 +117,7 @@ button:hover {
 
   <!-- Countdown -->
   <div id="circleBox" style="display:none;">
-    <div id="circleCountdown" style="width:120px; height:120px; border-radius:50%; border:6px solid #00ff99; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:bold;">5</div>
+    <div id="circleCountdown">5</div>
   </div>
 
   <!-- Results -->
@@ -116,11 +141,12 @@ function startAnalysis() {
   const url = document.getElementById("urlInput").value.trim();
   if (!url) return alert("Enter a website link");
 
-  // Hide previous
+  // Reset previous results
   document.getElementById("result").innerHTML = "";
   document.getElementById("riskCircle").style.display = "none";
   document.getElementById("warningText").innerHTML = "";
 
+  // Countdown
   let time = 5;
   const box = document.getElementById("circleBox");
   const countdown = document.getElementById("circleCountdown");
@@ -139,15 +165,17 @@ function startAnalysis() {
 }
 
 function analyze(url) {
-  // Simple simulation of percentages
-  let riskPercent = Math.floor(Math.random() * 100); // 0–99%
-  let isSafe = riskPercent > 50;
+  // Simulated risk percentage (0-100)
+  let riskPercent = Math.floor(Math.random() * 101);
+  
+  // Basic checks
   let isScam = /free|bonus|verify|login|crypto|wallet/i.test(url);
   let isIllegal = /hack|crack|pirate|cheat/i.test(url);
   let isHarmful = isScam || isIllegal;
   let isReal = !isScam && !isIllegal;
+  let isSafe = isReal && !isHarmful;
 
-  // Show results
+  // Show YES/NO
   document.getElementById("result").innerHTML = `
     REAL: <span class="${isReal ? 'good':'bad'}">${isReal?'YES':'NO ❗'}</span><br>
     SAFE: <span class="${isSafe?'good':'bad'}">${isSafe?'YES':'NO ❗'}</span><br>
@@ -156,12 +184,12 @@ function analyze(url) {
     ILLEGAL: <span class="${isIllegal?'bad':'good'}">${isIllegal?'YES ❗':'NO'}</span>
   `;
 
-  // Risk circle
+  // Show risk circle
   const circle = document.getElementById("riskCircle");
   circle.style.display = "flex";
   circle.innerText = `${riskPercent}%`;
 
-  // Color based on percentage
+  // Circle color
   if(riskPercent===100) circle.style.borderColor = "#006400"; // dark green
   else if(riskPercent>=90) circle.style.borderColor = "#00ff00"; // green
   else if(riskPercent>=70) circle.style.borderColor = "#00bfff"; // blue
@@ -171,7 +199,7 @@ function analyze(url) {
 
   // Warning text
   const warn = document.getElementById("warningText");
-  if(riskPercent>=90) warn.innerText = "✅ Safe to enter.";
+  if(riskPercent>=90) warn.innerText = "✅ This website appears safe to enter.";
   else if(riskPercent>=70) warn.innerText = "⚠️ Mostly safe, proceed with caution.";
   else if(riskPercent>=50) warn.innerText = "⚠️ Some risk detected, stay alert.";
   else if(riskPercent>=30) warn.innerText = "❌ High risk! Avoid entering.";
