@@ -2,210 +2,166 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RexSave</title>
+<title>Link Safety Analyzer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #2e8b57;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  color: white;
-}
+    body {
+        background: #0b0b0b;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
 
-.container {
-  background: rgba(0,0,0,0.25);
-  padding: 25px;
-  border-radius: 16px;
-  width: 360px;
-  text-align: center;
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
-}
+    .container {
+        width: 420px;
+        background: #111;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,255,255,0.15);
+        text-align: center;
+    }
 
-.title {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #00ff99;
-}
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
 
-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-  margin-bottom: 12px;
-}
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #00bfff;
+        color: #000;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
 
-button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: #00ff99;
-  font-weight: bold;
-  cursor: pointer;
-}
+    button:hover {
+        background: #00ffff;
+    }
 
-button:hover {
-  background: #33ffad;
-}
+    .circle-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+    }
 
-.result {
-  margin-top: 15px;
-  text-align: left;
-}
+    .circle {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 8px solid #555;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        font-size: 32px;
+        font-weight: bold;
+    }
 
-.good { color: #00ff99; font-weight: bold; }
-.bad { color: #ff4d4d; font-weight: bold; }
+    .status {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
 
-#circleBox {
-  width: 120px;
-  height: 120px;
-  margin: 20px auto;
-  position: relative;
-}
-
-#circleCountdown {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 6px solid #00ff99;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  font-weight: bold;
-  margin: 0 auto;
-}
-
-#riskCircle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 12px solid green;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  font-weight: bold;
-  margin: 20px auto; /* center horizontally */
-}
-
-#warningText {
-  margin-top: 10px;
-  font-size: 13px;
-}
-
-.info {
-  margin-top: 15px;
-  font-size: 12px;
-  opacity: 0.9;
-}
+    .warning {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #ff4d4d;
+    }
 </style>
 </head>
+
 <body>
-
 <div class="container">
-  <div class="title">🛡 RexSave</div>
+    <h2>Link Safety Analyzer</h2>
 
-  <input id="urlInput" placeholder="Paste website link here">
-  <button onclick="startAnalysis()">Analyze</button>
+    <input type="text" id="urlInput" placeholder="Enter URL to analyze">
+    <button onclick="analyze()">Analyze</button>
 
-  <!-- Countdown -->
-  <div id="circleBox" style="display:none;">
-    <div id="circleCountdown">5</div>
-  </div>
+    <div class="circle-wrapper">
+        <div class="circle" id="riskCircle">0%</div>
+    </div>
 
-  <!-- Results -->
-  <div id="result" class="result"></div>
-
-  <!-- Risk Circle -->
-  <div id="riskCircle" style="display:none;"></div>
-
-  <div id="warningText"></div>
-
-  <div class="info">
-    <b>Information:</b><br>
-    RexSave analyzes websites for safety, legitimacy, scams, harmful
-    behavior, and illegal content. Results are automated estimations and
-    should not replace professional judgment.
-  </div>
+    <div class="status" id="statusText"></div>
+    <div class="warning" id="warningText"></div>
 </div>
 
 <script>
-function startAnalysis() {
-  const url = document.getElementById("urlInput").value.trim();
-  if (!url) return alert("Enter a website link");
+function analyze() {
+    const url = document.getElementById("urlInput").value.trim();
+    const circle = document.getElementById("riskCircle");
+    const statusText = document.getElementById("statusText");
+    const warningText = document.getElementById("warningText");
 
-  // Reset previous results
-  document.getElementById("result").innerHTML = "";
-  document.getElementById("riskCircle").style.display = "none";
-  document.getElementById("warningText").innerHTML = "";
-
-  // Countdown
-  let time = 5;
-  const box = document.getElementById("circleBox");
-  const countdown = document.getElementById("circleCountdown");
-  box.style.display = "block";
-  countdown.innerText = time;
-
-  const timer = setInterval(() => {
-    time--;
-    countdown.innerText = time;
-    if (time === 0) {
-      clearInterval(timer);
-      box.style.display = "none";
-      analyze(url);
+    if (!url) {
+        alert("Please enter a URL");
+        return;
     }
-  }, 1000);
-}
 
-function analyze(url) {
-  // Simulated risk percentage (0-100)
-  let riskPercent = Math.floor(Math.random() * 101);
-  
-  // Basic checks
-  let isScam = /free|bonus|verify|login|crypto|wallet/i.test(url);
-  let isIllegal = /hack|crack|pirate|cheat/i.test(url);
-  let isHarmful = isScam || isIllegal;
-  let isReal = !isScam && !isIllegal;
-  let isSafe = isReal && !isHarmful;
+    let score = 100;
 
-  // Show YES/NO
-  document.getElementById("result").innerHTML = `
-    REAL: <span class="${isReal ? 'good':'bad'}">${isReal?'YES':'NO ❗'}</span><br>
-    SAFE: <span class="${isSafe?'good':'bad'}">${isSafe?'YES':'NO ❗'}</span><br>
-    HARMFUL: <span class="${isHarmful?'bad':'good'}">${isHarmful?'YES ❗':'NO'}</span><br>
-    SCAM: <span class="${isScam?'bad':'good'}">${isScam?'YES ❗':'NO'}</span><br>
-    ILLEGAL: <span class="${isIllegal?'bad':'good'}">${isIllegal?'YES ❗':'NO'}</span>
-  `;
+    // ---------- ANALYZER RULES (DETERMINISTIC) ----------
 
-  // Show risk circle
-  const circle = document.getElementById("riskCircle");
-  circle.style.display = "flex";
-  circle.innerText = `${riskPercent}%`;
+    if (!url.startsWith("http")) score -= 20;
+    if (url.length > 90) score -= 15;
+    if (url.includes("@")) score -= 30;
+    if (url.match(/\d{3,}/)) score -= 10;
+    if (url.match(/(login|verify|secure|update|account|bank)/i)) score -= 15;
+    if (url.match(/(bit\.ly|tinyurl|rb\.gy|t\.co)/i)) score -= 25;
+    if (url.match(/\.(exe|apk|zip|rar|scr)$/i)) score -= 35;
+    if (url.split(".").length > 4) score -= 10;
 
-  // Circle color
-  if(riskPercent===100) circle.style.borderColor = "#006400"; // dark green
-  else if(riskPercent>=90) circle.style.borderColor = "#00ff00"; // green
-  else if(riskPercent>=70) circle.style.borderColor = "#00bfff"; // blue
-  else if(riskPercent>=50) circle.style.borderColor = "#ffff00"; // yellow
-  else if(riskPercent>=30) circle.style.borderColor = "#ff8000"; // orange
-  else circle.style.borderColor = "#ff0000"; // red
+    if (score < 0) score = 0;
 
-  // Warning text
-  const warn = document.getElementById("warningText");
-  if(riskPercent>=90) warn.innerText = "✅ This website appears safe to enter.";
-  else if(riskPercent>=70) warn.innerText = "⚠️ Mostly safe, proceed with caution.";
-  else if(riskPercent>=50) warn.innerText = "⚠️ Some risk detected, stay alert.";
-  else if(riskPercent>=30) warn.innerText = "❌ High risk! Avoid entering.";
-  else warn.innerText = "❌ Dangerous website! Do NOT enter!";
+    // ---------- UI UPDATE ----------
+
+    circle.style.display = "flex";
+    circle.textContent = score + "%";
+
+    warningText.textContent = "";
+
+    if (score >= 90) {
+        circle.style.borderColor = "#00ff00";
+        statusText.textContent = "SAFE";
+        statusText.style.color = "#00ff00";
+    }
+    else if (score >= 70) {
+        circle.style.borderColor = "#00bfff";
+        statusText.textContent = "LOW RISK";
+        statusText.style.color = "#00bfff";
+    }
+    else if (score >= 50) {
+        circle.style.borderColor = "#ffff00";
+        statusText.textContent = "MEDIUM RISK";
+        statusText.style.color = "#ffff00";
+        warningText.textContent = "⚠️ Be cautious before proceeding.";
+    }
+    else if (score >= 30) {
+        circle.style.borderColor = "#ff8000";
+        statusText.textContent = "HIGH RISK";
+        statusText.style.color = "#ff8000";
+        warningText.textContent = "⚠️ Dangerous link. Do NOT enter personal data.";
+    }
+    else {
+        circle.style.borderColor = "#ff0000";
+        statusText.textContent = "EXTREMELY DANGEROUS";
+        statusText.style.color = "#ff0000";
+        warningText.textContent = "❌ DO NOT OPEN THIS LINK.";
+    }
 }
 </script>
-
 </body>
 </html>
