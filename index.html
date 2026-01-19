@@ -2,166 +2,166 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Link Safety Analyzer</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Safety Analyzer</title>
 
 <style>
-    body {
-        background: #0b0b0b;
-        color: #fff;
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-    }
+body {
+    background:#0e0e0e;
+    color:#fff;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
 
-    .container {
-        width: 420px;
-        background: #111;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 0 20px rgba(0,255,255,0.15);
-        text-align: center;
-    }
+.box {
+    width:420px;
+    background:#141414;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
 
-    input {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        border: none;
-        outline: none;
-        font-size: 16px;
-        margin-bottom: 15px;
-    }
+input {
+    width:100%;
+    padding:10px;
+    border-radius:6px;
+    border:none;
+    outline:none;
+    margin-bottom:10px;
+}
 
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #00bfff;
-        color: #000;
-        font-size: 16px;
-        font-weight: bold;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-    }
+button {
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    background:#00bcd4;
+    font-weight:bold;
+    cursor:pointer;
+}
 
-    button:hover {
-        background: #00ffff;
-    }
+button:hover {
+    background:#00e5ff;
+}
 
-    .circle-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 25px;
-    }
+.circle-container {
+    display:flex;
+    justify-content:center;
+    margin:20px 0;
+}
 
-    .circle {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        border: 8px solid #555;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        font-size: 32px;
-        font-weight: bold;
-    }
+.circle {
+    width:130px;
+    height:130px;
+    border-radius:50%;
+    border:8px solid #555;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:bold;
+}
 
-    .status {
-        margin-top: 15px;
-        font-size: 18px;
-        font-weight: bold;
-    }
+.status {
+    font-size:18px;
+    font-weight:bold;
+}
 
-    .warning {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #ff4d4d;
-    }
+.warning {
+    margin-top:8px;
+    font-size:14px;
+}
 </style>
 </head>
 
 <body>
-<div class="container">
-    <h2>Link Safety Analyzer</h2>
 
-    <input type="text" id="urlInput" placeholder="Enter URL to analyze">
+<div class="box">
+    <h3>Website Safety Analyzer</h3>
+
+    <input id="url" placeholder="Enter website link">
     <button onclick="analyze()">Analyze</button>
 
-    <div class="circle-wrapper">
-        <div class="circle" id="riskCircle">0%</div>
+    <div class="circle-container">
+        <div id="circle" class="circle">0%</div>
     </div>
 
-    <div class="status" id="statusText"></div>
-    <div class="warning" id="warningText"></div>
+    <div id="status" class="status"></div>
+    <div id="warning" class="warning"></div>
 </div>
 
 <script>
 function analyze() {
-    const url = document.getElementById("urlInput").value.trim();
-    const circle = document.getElementById("riskCircle");
-    const statusText = document.getElementById("statusText");
-    const warningText = document.getElementById("warningText");
+    const input = document.getElementById("url").value.trim();
+    const circle = document.getElementById("circle");
+    const status = document.getElementById("status");
+    const warning = document.getElementById("warning");
 
-    if (!url) {
-        alert("Please enter a URL");
-        return;
-    }
+    if (!input) return alert("Enter a link");
 
     let score = 100;
 
-    // ---------- ANALYZER RULES (DETERMINISTIC) ----------
+    // -------- STRONG RULE-BASED ANALYZER --------
 
-    if (!url.startsWith("http")) score -= 20;
-    if (url.length > 90) score -= 15;
-    if (url.includes("@")) score -= 30;
-    if (url.match(/\d{3,}/)) score -= 10;
-    if (url.match(/(login|verify|secure|update|account|bank)/i)) score -= 15;
-    if (url.match(/(bit\.ly|tinyurl|rb\.gy|t\.co)/i)) score -= 25;
-    if (url.match(/\.(exe|apk|zip|rar|scr)$/i)) score -= 35;
-    if (url.split(".").length > 4) score -= 10;
+    if (!input.startsWith("http")) score -= 20;
+    if (input.length > 80) score -= 15;
+    if (input.includes("@")) score -= 30;
+    if (input.match(/\d{4,}/)) score -= 10;
+    if (input.split(".").length > 4) score -= 10;
+
+    if (/(login|verify|secure|update|account|wallet|bank)/i.test(input))
+        score -= 15;
+
+    if (/(bit\.ly|tinyurl|t\.co|rb\.gy|is\.gd)/i.test(input))
+        score -= 25;
+
+    if (/\.(exe|apk|zip|rar|scr)$/i.test(input))
+        score -= 35;
+
+    if (/(free|bonus|winner|prize|claim)/i.test(input))
+        score -= 15;
 
     if (score < 0) score = 0;
 
-    // ---------- UI UPDATE ----------
+    // -------- DISPLAY --------
 
     circle.style.display = "flex";
     circle.textContent = score + "%";
-
-    warningText.textContent = "";
+    warning.textContent = "";
 
     if (score >= 90) {
-        circle.style.borderColor = "#00ff00";
-        statusText.textContent = "SAFE";
-        statusText.style.color = "#00ff00";
-    }
+        circle.style.borderColor = "lime";
+        status.textContent = "SAFE";
+        status.style.color = "lime";
+    } 
     else if (score >= 70) {
-        circle.style.borderColor = "#00bfff";
-        statusText.textContent = "LOW RISK";
-        statusText.style.color = "#00bfff";
-    }
+        circle.style.borderColor = "#00e5ff";
+        status.textContent = "LOW RISK";
+        status.style.color = "#00e5ff";
+    } 
     else if (score >= 50) {
-        circle.style.borderColor = "#ffff00";
-        statusText.textContent = "MEDIUM RISK";
-        statusText.style.color = "#ffff00";
-        warningText.textContent = "⚠️ Be cautious before proceeding.";
-    }
+        circle.style.borderColor = "yellow";
+        status.textContent = "MEDIUM RISK";
+        status.style.color = "yellow";
+        warning.textContent = "⚠ Be careful entering information.";
+    } 
     else if (score >= 30) {
-        circle.style.borderColor = "#ff8000";
-        statusText.textContent = "HIGH RISK";
-        statusText.style.color = "#ff8000";
-        warningText.textContent = "⚠️ Dangerous link. Do NOT enter personal data.";
-    }
+        circle.style.borderColor = "orange";
+        status.textContent = "HIGH RISK";
+        status.style.color = "orange";
+        warning.textContent = "⚠ Dangerous website. Do NOT enter data.";
+    } 
     else {
-        circle.style.borderColor = "#ff0000";
-        statusText.textContent = "EXTREMELY DANGEROUS";
-        statusText.style.color = "#ff0000";
-        warningText.textContent = "❌ DO NOT OPEN THIS LINK.";
+        circle.style.borderColor = "red";
+        status.textContent = "EXTREMELY DANGEROUS";
+        status.style.color = "red";
+        warning.textContent = "❌ DO NOT OPEN THIS LINK.";
     }
 }
 </script>
+
 </body>
 </html>
